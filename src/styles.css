@@ -20,6 +20,10 @@ html {
   scroll-behavior: smooth;
 }
 
+:root {
+  color-scheme: dark;
+}
+
 body {
   margin: 0;
   min-width: 320px;
@@ -31,6 +35,9 @@ body {
   font-family: var(--font-sans);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+  transition:
+    background 220ms ease,
+    color 220ms ease;
 }
 
 * {
@@ -81,6 +88,10 @@ summary {
   @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950;
 }
 
+.theme-toggle {
+  @apply inline-flex size-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-slate-100;
+}
+
 .brand-mark {
   @apply inline-flex size-11 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,_#7ff5ff_0%,_#28c9ff_58%,_#ff9b5d_100%)] text-base font-bold text-slate-950;
   box-shadow:
@@ -101,7 +112,8 @@ summary {
 }
 
 .hero-stage {
-  @apply relative min-h-[24rem] overflow-hidden rounded-[1.5rem] border border-white/10;
+  @apply relative overflow-hidden rounded-[1.5rem] border border-white/10;
+  min-height: clamp(30rem, 46vw, 40rem);
   background:
     linear-gradient(180deg, rgba(16, 28, 43, 0.44) 0%, rgba(7, 15, 24, 0.94) 100%),
     radial-gradient(circle at 50% 40%, rgba(127, 245, 255, 0.12), transparent 24%);
@@ -204,6 +216,154 @@ summary {
   @apply fixed bottom-4 right-4 z-50 flex w-[min(15.5rem,calc(100vw-2rem))] gap-2 rounded-[1.25rem] border border-white/10 bg-slate-950/88 p-2 shadow-panel backdrop-blur-xl;
 }
 
+html[data-theme="light"] body {
+  background:
+    radial-gradient(circle at top, rgba(40, 201, 255, 0.18), transparent 32%),
+    radial-gradient(circle at 84% 10%, rgba(255, 155, 93, 0.16), transparent 18%),
+    linear-gradient(180deg, #f8fbff 0%, #eef6fb 52%, #ffffff 100%);
+  color: #172033;
+}
+
+.theme-light {
+  color: #172033;
+}
+
+.theme-light :is(.text-white, .text-slate-100, .text-slate-200) {
+  color: #172033;
+}
+
+.theme-light :is(.text-slate-300, .text-slate-400, .text-slate-500) {
+  color: #526171;
+}
+
+.theme-light :is(.text-cyan-100, .text-cyan-200, .text-cyan-300) {
+  color: #087b96;
+}
+
+.theme-light [class*="border-white/"] {
+  border-color: rgba(15, 23, 42, 0.12);
+}
+
+.theme-light [class*="bg-white/"] {
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.theme-light [class*="bg-slate-950/"] {
+  background-color: rgba(255, 255, 255, 0.78);
+}
+
+.theme-light .focus-ring:focus-visible {
+  --tw-ring-offset-color: #f8fbff;
+}
+
+.theme-light header {
+  background: rgba(255, 255, 255, 0.84);
+  border-color: rgba(15, 23, 42, 0.1);
+}
+
+.theme-light #mobile-menu {
+  background: rgba(248, 251, 255, 0.97);
+}
+
+.theme-light .theme-toggle {
+  background: rgba(255, 255, 255, 0.86);
+  border-color: rgba(15, 23, 42, 0.12);
+  color: #172033;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08);
+}
+
+.theme-light .eyebrow {
+  background: rgba(255, 255, 255, 0.72);
+  border-color: rgba(8, 123, 150, 0.18);
+  color: #087b96;
+}
+
+.theme-light :is(.hero-stage, .media-frame, .service-panel, .segment-panel, .pricing-panel, .insight-panel, .faq-item, .quote-line, .trust-band) {
+  background-color: rgba(255, 255, 255, 0.68);
+  border-color: rgba(15, 23, 42, 0.11);
+  box-shadow: 0 22px 70px rgba(25, 45, 68, 0.12);
+}
+
+.theme-light .metrics-strip {
+  border-color: rgba(15, 23, 42, 0.11);
+}
+
+.theme-light .pricing-panel-featured {
+  background: rgba(8, 145, 178, 0.1);
+  border-color: rgba(8, 145, 178, 0.32);
+}
+
+.theme-light .pricing-badge {
+  background: rgba(8, 145, 178, 0.12);
+  border-color: rgba(8, 145, 178, 0.24);
+  color: #075e73;
+}
+
+.theme-light :is(input, select, textarea) {
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(15, 23, 42, 0.14);
+  color: #172033;
+}
+
+.theme-light :is(input, textarea)::placeholder {
+  color: #7a8794;
+}
+
+.theme-light .form-status-success {
+  background: rgba(4, 120, 87, 0.1);
+  border-color: rgba(4, 120, 87, 0.22);
+  color: #065f46;
+}
+
+.theme-light .form-status-error {
+  background: rgba(234, 88, 12, 0.1);
+  border-color: rgba(234, 88, 12, 0.24);
+  color: #9a3412;
+}
+
+.theme-light footer {
+  background: rgba(255, 255, 255, 0.58);
+  border-color: rgba(15, 23, 42, 0.1);
+}
+
+.theme-light .mobile-cta-bar {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(15, 23, 42, 0.12);
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.14);
+}
+
+.theme-light #home :is(.text-white, .text-slate-100, .text-slate-200),
+.theme-light .hero-stage :is(.text-white, .text-slate-100, .text-slate-200),
+.theme-light .case-study-card :is(.text-white, .text-slate-100, .text-slate-200),
+.theme-light .audit-visual-panel :is(.text-white, .text-slate-100, .text-slate-200) {
+  color: #ffffff;
+}
+
+.theme-light #home :is(.text-slate-300, .text-slate-400, .text-slate-500),
+.theme-light .hero-stage :is(.text-slate-300, .text-slate-400, .text-slate-500),
+.theme-light .case-study-card :is(.text-slate-300, .text-slate-400, .text-slate-500),
+.theme-light .audit-visual-panel :is(.text-slate-300, .text-slate-400, .text-slate-500) {
+  color: #d6e4ef;
+}
+
+.theme-light #home :is(.text-cyan-100, .text-cyan-200, .text-cyan-300),
+.theme-light .hero-stage :is(.text-cyan-100, .text-cyan-200, .text-cyan-300),
+.theme-light .case-study-card :is(.text-cyan-100, .text-cyan-200, .text-cyan-300),
+.theme-light .audit-visual-panel :is(.text-cyan-100, .text-cyan-200, .text-cyan-300) {
+  color: #aaf6ff;
+}
+
+.theme-light #home :is([class*="bg-white/"], [class*="bg-slate-950/"]),
+.theme-light .hero-stage :is([class*="bg-white/"], [class*="bg-slate-950/"]),
+.theme-light .case-study-card :is([class*="bg-white/"], [class*="bg-slate-950/"]),
+.theme-light .audit-visual-panel :is([class*="bg-white/"], [class*="bg-slate-950/"]) {
+  background-color: rgba(3, 7, 18, 0.6);
+}
+
+.theme-light .action-primary {
+  color: #06101a;
+}
+
 summary::-webkit-details-marker {
   display: none;
 }
@@ -214,7 +374,7 @@ summary::-webkit-details-marker {
   }
 
   .hero-stage {
-    min-height: 20rem;
+    min-height: clamp(25rem, 74vw, 34rem);
   }
 
   .media-frame {

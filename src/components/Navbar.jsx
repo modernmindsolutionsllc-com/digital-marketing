@@ -1,9 +1,29 @@
 import { useEffect, useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, Moon, Sun, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { navigation } from "../data/siteContent";
 
-export default function Navbar() {
+function ThemeToggle({ theme, onThemeToggle }) {
+  const isLight = theme === "light";
+  const Icon = isLight ? Moon : Sun;
+  const label = `Switch to ${isLight ? "dark" : "light"} mode`;
+
+  return (
+    <button
+      type="button"
+      className="theme-toggle focus-ring"
+      aria-label={label}
+      aria-pressed={isLight}
+      title={label}
+      onClick={onThemeToggle}
+    >
+      <Icon size={18} />
+      <span className="sr-only">{label}</span>
+    </button>
+  );
+}
+
+export default function Navbar({ theme, onThemeToggle }) {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
@@ -38,6 +58,7 @@ export default function Navbar() {
         </div>
 
         <div className="hidden items-center gap-3 lg:flex">
+          <ThemeToggle theme={theme} onThemeToggle={onThemeToggle} />
           <a
             href="#audit"
             className="focus-ring action-primary rounded-full px-5 py-2.5 text-sm font-semibold text-slate-950"
@@ -46,16 +67,19 @@ export default function Navbar() {
           </a>
         </div>
 
-        <button
-          type="button"
-          className="focus-ring inline-flex size-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-slate-100 lg:hidden"
-          aria-expanded={isOpen}
-          aria-controls="mobile-menu"
-          aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
-          onClick={() => setIsOpen((open) => !open)}
-        >
-          {isOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
+        <div className="flex items-center gap-2 lg:hidden">
+          <ThemeToggle theme={theme} onThemeToggle={onThemeToggle} />
+          <button
+            type="button"
+            className="focus-ring inline-flex size-11 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] text-slate-100"
+            aria-expanded={isOpen}
+            aria-controls="mobile-menu"
+            aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
+            onClick={() => setIsOpen((open) => !open)}
+          >
+            {isOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </nav>
 
       <AnimatePresence>

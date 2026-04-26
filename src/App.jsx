@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import {
   AlertCircle,
   ArrowRight,
@@ -55,6 +55,24 @@ const schemaGraph = {
 function trackLeadEvent(eventName, payload = {}) {
   window.dataLayer = window.dataLayer || [];
   window.dataLayer.push({ event: eventName, ...payload });
+}
+
+function getInitialTheme() {
+  if (typeof window === "undefined") {
+    return "dark";
+  }
+
+  try {
+    const storedTheme = window.localStorage.getItem("growthpulse-theme");
+
+    if (storedTheme === "light" || storedTheme === "dark") {
+      return storedTheme;
+    }
+
+    return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+  } catch {
+    return "dark";
+  }
 }
 
 function ServiceGroup({ group, index }) {
@@ -251,6 +269,22 @@ function FaqItem({ faq, index }) {
 
 export default function App() {
   const [formStatus, setFormStatus] = useState("idle");
+  const [theme, setTheme] = useState(getInitialTheme);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+
+    try {
+      window.localStorage.setItem("growthpulse-theme", theme);
+    } catch {
+      // Theme still works for the active session when storage is unavailable.
+    }
+  }, [theme]);
+
+  function toggleTheme() {
+    setTheme((currentTheme) => (currentTheme === "dark" ? "light" : "dark"));
+  }
 
   function handleAuditSubmit(event) {
     event.preventDefault();
@@ -272,14 +306,14 @@ export default function App() {
   }
 
   return (
-    <div className="relative overflow-x-clip">
+    <div className={`relative overflow-x-clip theme-${theme}`}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaGraph) }} />
 
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[52rem] bg-[radial-gradient(circle_at_top,_rgba(116,248,255,0.16),_transparent_42%),radial-gradient(circle_at_78%_16%,_rgba(255,153,92,0.16),_transparent_20%)]" />
       <div className="pointer-events-none absolute left-[-10rem] top-[34rem] h-80 w-80 rounded-full bg-cyan-400/8 blur-[150px]" />
       <div className="pointer-events-none absolute right-[-12rem] top-[68rem] h-96 w-96 rounded-full bg-orange-400/10 blur-[180px]" />
 
-      <Navbar />
+      <Navbar theme={theme} onThemeToggle={toggleTheme} />
 
       <main>
         <section id="home" className="relative isolate min-h-[calc(100svh-4.5rem)] overflow-hidden">
@@ -292,7 +326,7 @@ export default function App() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,_rgba(116,248,255,0.14),_transparent_20%),radial-gradient(circle_at_82%_72%,_rgba(255,153,92,0.18),_transparent_24%)]" />
 
           <div className="section-shell relative flex min-h-[calc(100svh-4.5rem)] items-center py-12 sm:py-14 lg:py-16">
-            <div className="grid w-full gap-9 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+            <div className="grid w-full gap-9 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
               <Reveal>
                 <div className="max-w-2xl">
                   <span className="eyebrow">GrowthPulse Digital</span>
@@ -554,7 +588,7 @@ export default function App() {
           <Reveal>
             <div className="overflow-hidden rounded-[2rem] border border-white/10 bg-[linear-gradient(180deg,_rgba(255,255,255,0.04)_0%,_rgba(255,255,255,0.02)_100%)]">
               <div className="grid gap-0 lg:grid-cols-[0.78fr_1.22fr]">
-                <div className="relative overflow-hidden border-b border-white/10 p-8 sm:p-10 lg:border-b-0 lg:border-r">
+                <div className="audit-visual-panel relative overflow-hidden border-b border-white/10 p-8 sm:p-10 lg:border-b-0 lg:border-r">
                   <img
                     src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80"
                     alt="Team workshop session around laptops and notes."
