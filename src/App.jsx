@@ -14,6 +14,9 @@ import {
 import Navbar from "./components/Navbar";
 import Reveal from "./components/Reveal";
 import SectionHeading from "./components/SectionHeading";
+import SmartAuditFlow from "./components/SmartAuditFlow";
+import DashboardTeaser from "./components/DashboardTeaser";
+import MethodologyMatrix from "./components/MethodologyMatrix";
 import {
   auditDeliverables,
   buyerSegments,
@@ -551,6 +554,48 @@ export default function App() {
             {pricingTiers.map((tier, index) => (
               <PricingTier key={tier.name} tier={tier} index={index} />
             ))}
+          </div>
+        </section>
+
+        <section id="smart-audit" className="section-shell section-space pt-0">
+          <SectionHeading
+            eyebrow="Smart Audit"
+            title="Tell us your goal. We will shape the audit around it."
+            description="Answer three quick questions so our team can prepare a tailored opportunity map instead of a generic checklist."
+          />
+
+          <div className="mt-7">
+            <Reveal>
+              <SmartAuditFlow />
+            </Reveal>
+          </div>
+        </section>
+
+        <section id="portal" className="section-shell section-space pt-0">
+          <SectionHeading
+            eyebrow="Client Portal"
+            title="Transparency is the strategy. Every client sees the full picture."
+            description="Our reporting portal connects campaign performance, channel health, and optimization actions in one live view — updated weekly with plain-language strategy notes."
+          />
+
+          <div className="mt-7">
+            <Reveal>
+              <DashboardTeaser />
+            </Reveal>
+          </div>
+        </section>
+
+        <section id="methodology" className="section-shell section-space pt-0">
+          <SectionHeading
+            eyebrow="Methodology"
+            title="Platform fluency organized by growth pillar."
+            description="We use best-in-class tools for every stage of the funnel. Select a pillar to explore the stack and see a relevant case study."
+          />
+
+          <div className="mt-7">
+            <Reveal>
+              <MethodologyMatrix />
+            </Reveal>
           </div>
         </section>
 

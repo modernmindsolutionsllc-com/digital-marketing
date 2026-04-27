@@ -216,6 +216,114 @@ summary {
   @apply fixed bottom-4 right-4 z-50 flex w-[min(15.5rem,calc(100vw-2rem))] gap-2 rounded-[1.25rem] border border-white/10 bg-slate-950/88 p-2 shadow-panel backdrop-blur-xl;
 }
 
+/* ── SmartAuditFlow ── */
+
+.audit-flow-wrapper {
+  @apply rounded-[2rem] border border-white/10 bg-white/[0.02] p-6 sm:p-8;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%),
+    radial-gradient(circle at 20% 0%, rgba(127, 245, 255, 0.06), transparent 40%);
+  box-shadow: var(--shadow-panel);
+}
+
+.audit-flow-card {
+  @apply cursor-pointer rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-5 transition-all duration-200;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
+}
+
+.audit-flow-card:hover {
+  border-color: rgba(127, 245, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.audit-flow-card-active {
+  border-color: rgba(127, 245, 255, 0.35) !important;
+  background: rgba(127, 245, 255, 0.06) !important;
+  box-shadow:
+    0 0 0 1px rgba(127, 245, 255, 0.12),
+    0 16px 48px rgba(127, 245, 255, 0.08);
+}
+
+/* ── DashboardTeaser ── */
+
+.dashboard-teaser-wrapper {
+  @apply overflow-hidden rounded-[2rem] border border-white/10;
+  background:
+    linear-gradient(180deg, rgba(12, 23, 36, 0.92) 0%, rgba(6, 16, 26, 0.98) 100%),
+    radial-gradient(circle at 70% 10%, rgba(127, 245, 255, 0.06), transparent 32%);
+  box-shadow:
+    var(--shadow-panel),
+    0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.dashboard-chrome {
+  @apply flex items-center justify-between border-b border-white/8 px-4 py-2.5;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.dashboard-widget {
+  @apply relative rounded-[1.25rem] border border-white/8 bg-white/[0.02] p-4;
+  transition:
+    border-color 220ms ease,
+    background-color 220ms ease,
+    box-shadow 220ms ease;
+}
+
+.dashboard-widget:hover {
+  border-color: rgba(127, 245, 255, 0.18);
+  background: rgba(255, 255, 255, 0.035);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+}
+
+.dashboard-tooltip {
+  @apply absolute left-0 right-0 top-full z-20 mt-2 rounded-xl border border-white/12 bg-slate-950/95 p-3 backdrop-blur-xl;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.32);
+}
+
+/* ── MethodologyMatrix ── */
+
+.methodology-tabs {
+  @apply flex gap-2 overflow-x-auto rounded-[1rem] border border-white/8 bg-white/[0.02] p-1.5;
+  scrollbar-width: none;
+}
+
+.methodology-tabs::-webkit-scrollbar {
+  display: none;
+}
+
+.methodology-tab {
+  @apply relative flex flex-1 cursor-pointer items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200;
+}
+
+.methodology-tab:hover {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.methodology-tab-active {
+  background: transparent;
+}
+
+.methodology-tool-card {
+  @apply relative cursor-default rounded-[1rem] border border-white/8 bg-white/[0.02] p-4;
+  transition:
+    border-color 200ms ease,
+    background-color 200ms ease,
+    box-shadow 200ms ease;
+}
+
+.methodology-tool-card:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.16);
+}
+
+.methodology-case-card {
+  @apply rounded-[1.25rem] border border-white/10 bg-white/[0.03] p-5;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035) 0%, rgba(255, 255, 255, 0.012) 100%);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.16);
+}
+
 html[data-theme="light"] body {
   background:
     radial-gradient(circle at top, rgba(40, 201, 255, 0.18), transparent 32%),
@@ -362,6 +470,32 @@ html[data-theme="light"] body {
 
 .theme-light .action-primary {
   color: #06101a;
+}
+
+.theme-light :is(.audit-flow-wrapper, .audit-flow-card, .dashboard-teaser-wrapper, .dashboard-widget, .dashboard-chrome, .dashboard-tooltip, .methodology-tabs, .methodology-tab, .methodology-tool-card, .methodology-case-card) {
+  background-color: rgba(255, 255, 255, 0.72);
+  border-color: rgba(15, 23, 42, 0.1);
+  box-shadow: 0 18px 56px rgba(25, 45, 68, 0.1);
+}
+
+.theme-light .audit-flow-card-active {
+  border-color: rgba(8, 145, 178, 0.35) !important;
+  background: rgba(8, 145, 178, 0.08) !important;
+  box-shadow: 0 0 0 1px rgba(8, 145, 178, 0.12), 0 12px 40px rgba(8, 145, 178, 0.06);
+}
+
+.theme-light .dashboard-teaser-wrapper {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(248, 251, 255, 0.94) 100%);
+}
+
+.theme-light .methodology-tab:hover {
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.theme-light .methodology-tool-card:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(15, 23, 42, 0.15);
 }
 
 summary::-webkit-details-marker {
