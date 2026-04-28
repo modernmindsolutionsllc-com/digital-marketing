@@ -11,6 +11,9 @@ import {
   ShoppingCart,
   Target,
   Users,
+  Phone,
+  Building2,
+  FileText,
 } from "lucide-react";
 
 const GOALS = [
@@ -103,7 +106,7 @@ export default function SmartAuditFlow() {
   const [direction, setDirection] = useState(1);
   const [goal, setGoal] = useState(null);
   const [adaptiveAnswer, setAdaptiveAnswer] = useState(null);
-  const [formData, setFormData] = useState({ name: "", url: "", email: "" });
+  const [formData, setFormData] = useState({ name: "", phone: "", email: "", company: "", description: "" });
   const [submitted, setSubmitted] = useState(false);
 
   const totalSteps = 3;
@@ -130,10 +133,33 @@ export default function SmartAuditFlow() {
     setTimeout(goNext, 280);
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    if (!formData.name || !formData.email || !formData.url) return;
-    setSubmitted(true);
+    if (!formData.name || !formData.email || !formData.phone) return;
+
+    try {
+      const response = await fetch(import.meta.env.VITE_FORMSPREE_ENDPOINT, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          ...formData,
+          goal,
+          adaptiveAnswer
+        }),
+      });
+
+      if (response.ok) {
+        setSubmitted(true);
+      } else {
+        console.error("Form submission failed");
+        // Optionally handle error state here
+      }
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    }
   }
 
   const adaptiveOptions = goal === "ecommerce" ? ECOMMERCE_PLATFORMS : LEAD_VOLUMES;
@@ -299,33 +325,33 @@ export default function SmartAuditFlow() {
                 </p>
 
                 <form onSubmit={handleSubmit} className="mt-6 grid gap-4">
-                  <label className="grid gap-2 text-sm text-slate-200">
-                    <span className="flex items-center gap-2">
-                      <Users size={14} className="text-cyan-300" />
-                      Full Name
-                    </span>
-                    <input
-                      type="text"
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      required
-                      placeholder="Jane Smith"
-                      className="focus-ring rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 text-white placeholder:text-slate-500"
-                    />
-                  </label>
-
                   <div className="grid gap-4 sm:grid-cols-2">
                     <label className="grid gap-2 text-sm text-slate-200">
                       <span className="flex items-center gap-2">
-                        <Globe size={14} className="text-cyan-300" />
-                        Website URL
+                        <Users size={14} className="text-cyan-300" />
+                        Full Name
                       </span>
                       <input
-                        type="url"
-                        value={formData.url}
-                        onChange={(e) => setFormData({ ...formData, url: e.target.value })}
+                        type="text"
+                        value={formData.name}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         required
-                        placeholder="https://yoursite.com"
+                        placeholder="Jane Smith"
+                        className="focus-ring rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 text-white placeholder:text-slate-500"
+                      />
+                    </label>
+
+                    <label className="grid gap-2 text-sm text-slate-200">
+                      <span className="flex items-center gap-2">
+                        <Phone size={14} className="text-cyan-300" />
+                        Phone Number
+                      </span>
+                      <input
+                        type="tel"
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        required
+                        placeholder="+1 (555) 000-0000"
                         className="focus-ring rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 text-white placeholder:text-slate-500"
                       />
                     </label>
@@ -344,7 +370,35 @@ export default function SmartAuditFlow() {
                         className="focus-ring rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 text-white placeholder:text-slate-500"
                       />
                     </label>
+
+                    <label className="grid gap-2 text-sm text-slate-200">
+                      <span className="flex items-center gap-2">
+                        <Building2 size={14} className="text-cyan-300" />
+                        Company Name
+                      </span>
+                      <input
+                        type="text"
+                        value={formData.company}
+                        onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                        placeholder="Acme Corp"
+                        className="focus-ring rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 text-white placeholder:text-slate-500"
+                      />
+                    </label>
                   </div>
+
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span className="flex items-center gap-2">
+                      <FileText size={14} className="text-cyan-300" />
+                      Description
+                    </span>
+                    <textarea
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      placeholder="Tell us a bit about what you're looking for..."
+                      rows={3}
+                      className="focus-ring resize-none rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 text-white placeholder:text-slate-500"
+                    />
+                  </label>
 
                   <div className="mt-2 flex flex-wrap items-center gap-3">
                     <button
