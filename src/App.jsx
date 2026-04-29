@@ -289,7 +289,7 @@ export default function App() {
     setTheme((currentTheme) => (currentTheme === "dark" ? "light" : "dark"));
   }
 
-  function handleAuditSubmit(event) {
+  async function handleAuditSubmit(event) {
     event.preventDefault();
     const form = event.currentTarget;
 
@@ -299,13 +299,34 @@ export default function App() {
       return;
     }
 
-    const formData = new FormData(form);
+    const data = new FormData(form);
     trackLeadEvent("audit_form_submit", {
-      goal: formData.get("goal"),
-      website: formData.get("website"),
+      goal: data.get("goal"),
     });
-    setFormStatus("success");
-    form.reset();
+
+    try {
+      const response = await fetch(import.meta.env.VITE_FORMSPREE_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify({
+          name: data.get("name"),
+          phone: data.get("phone"),
+          email: data.get("email"),
+          company: data.get("company"),
+          service: data.get("goal"),
+          description: data.get("description"),
+        }),
+      });
+
+      if (response.ok) {
+        setFormStatus("success");
+        form.reset();
+      } else {
+        setFormStatus("error");
+      }
+    } catch {
+      setFormStatus("error");
+    }
   }
 
   return (
@@ -678,19 +699,31 @@ export default function App() {
                   </div>
 
                   <form className="grid gap-5" onSubmit={handleAuditSubmit}>
-                    <label className="grid gap-2 text-sm text-slate-200">
-                      <span>Name</span>
-                      <input
-                        type="text"
-                        name="name"
-                        required
-                        autoComplete="name"
-                        placeholder="Your full name"
-                        className="focus-ring rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 text-white placeholder:text-slate-500"
-                      />
-                    </label>
-
                     <div className="grid gap-5 sm:grid-cols-2">
+                      <label className="grid gap-2 text-sm text-slate-200">
+                        <span>Name</span>
+                        <input
+                          type="text"
+                          name="name"
+                          required
+                          autoComplete="name"
+                          placeholder="Your full name"
+                          className="focus-ring rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 text-white placeholder:text-slate-500"
+                        />
+                      </label>
+
+                      <label className="grid gap-2 text-sm text-slate-200">
+                        <span>Phone Number</span>
+                        <input
+                          type="tel"
+                          name="phone"
+                          required
+                          autoComplete="tel"
+                          placeholder="+1 (800) 555 0199"
+                          className="focus-ring rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 text-white placeholder:text-slate-500"
+                        />
+                      </label>
+
                       <label className="grid gap-2 text-sm text-slate-200">
                         <span>Email</span>
                         <input
@@ -704,20 +737,19 @@ export default function App() {
                       </label>
 
                       <label className="grid gap-2 text-sm text-slate-200">
-                        <span>Website URL</span>
+                        <span>Company Name</span>
                         <input
-                          type="url"
-                          name="website"
-                          required
-                          autoComplete="url"
-                          placeholder="https://yourwebsite.com"
+                          type="text"
+                          name="company"
+                          autoComplete="organization"
+                          placeholder="Acme Corp"
                           className="focus-ring rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 text-white placeholder:text-slate-500"
                         />
                       </label>
                     </div>
 
                     <label className="grid gap-2 text-sm text-slate-200">
-                      <span>Main marketing goal</span>
+                      <span>Services</span>
                       <select
                         name="goal"
                         defaultValue=""
@@ -725,7 +757,7 @@ export default function App() {
                         className="focus-ring rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 text-white"
                       >
                         <option value="" disabled>
-                          Select your main goal
+                          Select a service
                         </option>
                         {marketingGoals.map((goal) => (
                           <option key={goal} value={goal}>
@@ -736,19 +768,19 @@ export default function App() {
                     </label>
 
                     <label className="grid gap-2 text-sm text-slate-200">
-                      <span>Message</span>
+                      <span>Description</span>
                       <textarea
-                        name="message"
-                        rows="5"
+                        name="description"
+                        rows="4"
                         placeholder="Tell us where your funnel feels stuck right now."
-                        className="focus-ring rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 text-white placeholder:text-slate-500"
+                        className="focus-ring resize-none rounded-2xl border border-white/10 bg-slate-950/55 px-4 py-3 text-white placeholder:text-slate-500"
                       />
                     </label>
 
                     {formStatus === "success" ? (
                       <div className="form-status form-status-success" role="status">
                         <CheckCircle2 size={18} />
-                        <span>Audit request captured. In production, this is ready to connect to your form service or CRM endpoint.</span>
+                        <span>Audit request sent! We will be in touch within one business day.</span>
                       </div>
                     ) : null}
 
