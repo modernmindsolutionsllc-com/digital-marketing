@@ -272,6 +272,8 @@ function FaqItem({ faq, index }) {
 
 export default function App() {
   const [formStatus, setFormStatus] = useState("idle");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const [theme, setTheme] = useState(getInitialTheme);
 
   useEffect(() => {
@@ -294,10 +296,13 @@ export default function App() {
     const form = event.currentTarget;
 
     if (!form.checkValidity()) {
-      setFormStatus("error");
+      setFormStatus("validation_error");
       form.reportValidity();
       return;
     }
+
+    setIsSubmitting(true);
+    setFormStatus("idle");
 
     const data = new FormData(form);
     trackLeadEvent("audit_form_submit", {
@@ -305,7 +310,7 @@ export default function App() {
     });
 
     try {
-      const response = await fetch(import.meta.env.VITE_FORMSPREE_ENDPOINT, {
+      const response = await fetch("/api/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json", Accept: "application/json" },
         body: JSON.stringify({
@@ -318,14 +323,34 @@ export default function App() {
         }),
       });
 
-      if (response.ok) {
+      let result;
+      try {
+        result = await response.json();
+      } catch {
+        // Response wasn't valid JSON (e.g. 404 HTML page)
+        setFormStatus("server_error");
+        setErrorMessage("Server returned an unexpected response. Please try again later.");
+        return;
+      }
+
+      if (response.ok && result.success) {
         setFormStatus("success");
         form.reset();
       } else {
-        setFormStatus("error");
+        setFormStatus("server_error");
+        // Safely extract a string — result.error or result.message may be an object
+        const raw = result.error || result.message || "Something went wrong. Please try again.";
+        setErrorMessage(typeof raw === "string" ? raw : raw.message || JSON.stringify(raw));
       }
-    } catch {
-      setFormStatus("error");
+    } catch (err) {
+      setFormStatus("server_error");
+      setErrorMessage(
+        typeof err === "object" && err !== null && typeof err.message === "string"
+          ? err.message
+          : "An unexpected error occurred."
+      );
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -784,19 +809,27 @@ export default function App() {
                       </div>
                     ) : null}
 
-                    {formStatus === "error" ? (
+                    {formStatus === "validation_error" ? (
                       <div className="form-status form-status-error" role="alert">
                         <AlertCircle size={18} />
                         <span>Please complete the required fields so the audit request has enough context.</span>
                       </div>
                     ) : null}
 
+                    {formStatus === "server_error" ? (
+                      <div className="form-status form-status-error" role="alert">
+                        <AlertCircle size={18} />
+                        <span>{errorMessage}</span>
+                      </div>
+                    ) : null}
+
                     <button
                       type="submit"
-                      className="focus-ring action-primary inline-flex items-center justify-center gap-2 rounded-full px-6 py-4 text-base font-semibold text-slate-950"
+                      disabled={isSubmitting}
+                      className="focus-ring action-primary inline-flex items-center justify-center gap-2 rounded-full px-6 py-4 text-base font-semibold text-slate-950 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                       <Send size={18} />
-                      Send my audit request
+                      {isSubmitting ? "Submitting…" : "Send my audit request"}
                     </button>
 
                     <p className="text-xs leading-6 text-slate-500">

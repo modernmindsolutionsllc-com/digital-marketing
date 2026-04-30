@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  AlertCircle,
   ArrowLeft,
   ArrowRight,
   CheckCircle2,
@@ -108,6 +109,8 @@ export default function SmartAuditFlow() {
   const [adaptiveAnswer, setAdaptiveAnswer] = useState(null);
   const [formData, setFormData] = useState({ name: "", phone: "", email: "", company: "", description: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState(null);
 
   const totalSteps = 3;
   const progress = ((step + 1) / totalSteps) * 100;
@@ -137,28 +140,34 @@ export default function SmartAuditFlow() {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.phone) return;
 
+    setIsSubmitting(true);
+    setError(null);
+
     try {
-      const response = await fetch(import.meta.env.VITE_FORMSPREE_ENDPOINT, {
+      const response = await fetch("/api/submit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json"
+          Accept: "application/json",
         },
         body: JSON.stringify({
           ...formData,
           goal,
-          adaptiveAnswer
+          adaptiveAnswer,
         }),
       });
 
-      if (response.ok) {
+      const result = await response.json();
+
+      if (response.ok && result.success) {
         setSubmitted(true);
       } else {
-        console.error("Form submission failed");
-        // Optionally handle error state here
+        setError(result.error || "Something went wrong. Please try again.");
       }
-    } catch (error) {
-      console.error("Error submitting form:", error);
+    } catch (err) {
+      setError("Network error. Please check your connection and try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -400,6 +409,13 @@ export default function SmartAuditFlow() {
                     />
                   </label>
 
+                  {error ? (
+                    <div className="mt-2 flex items-center gap-2 rounded-2xl border border-rose-400/30 bg-rose-400/10 px-4 py-3 text-sm text-rose-300">
+                      <AlertCircle size={16} className="shrink-0" />
+                      <span>{error}</span>
+                    </div>
+                  ) : null}
+
                   <div className="mt-2 flex flex-wrap items-center gap-3">
                     <button
                       type="button"
@@ -412,10 +428,11 @@ export default function SmartAuditFlow() {
 
                     <button
                       type="submit"
-                      className="focus-ring action-primary inline-flex items-center gap-2 rounded-full px-6 py-3 text-base font-semibold text-slate-950"
+                      disabled={isSubmitting}
+                      className="focus-ring action-primary inline-flex items-center gap-2 rounded-full px-6 py-3 text-base font-semibold text-slate-950 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
                       <Send size={16} />
-                      Submit audit request
+                      {isSubmitting ? "Submitting…" : "Submit audit request"}
                     </button>
                   </div>
                 </form>
