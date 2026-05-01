@@ -6,10 +6,12 @@ import {
   ArrowRight,
   CheckCircle2,
   Globe,
+  Lightbulb,
   Megaphone,
   Rocket,
   Send,
   ShoppingCart,
+  Sparkles,
   Target,
   Users,
   Phone,
@@ -55,6 +57,42 @@ const LEAD_VOLUMES = [
   { id: "50to200", label: "50–200 / mo", description: "Growing demand capture." },
   { id: "200plus", label: "200+ / mo", description: "Scaling and optimization." },
 ];
+
+const DISCOVERY_TIPS = {
+  ecommerce: {
+    label: "E-commerce Insight",
+    gradient: "from-cyan-400/20 to-blue-500/20",
+    border: "border-cyan-400/30",
+    accent: "text-cyan-300",
+    icon: ShoppingCart,
+    headline: "Quick Win Identified",
+    tip: "Brands with optimized checkout flows see up to 15% lower cart abandonment. Our audit will map your drop-off points and recommend high-impact fixes.",
+    stat: "15%",
+    statLabel: "avg. abandonment reduction",
+  },
+  leadgen: {
+    label: "Lead Gen Insight",
+    gradient: "from-orange-400/20 to-rose-500/20",
+    border: "border-orange-400/30",
+    accent: "text-orange-300",
+    icon: Target,
+    headline: "Conversion Opportunity",
+    tip: "Forms using micro-commitment patterns (progressive disclosure, multi-step flows) convert 20-30% higher. We'll benchmark your current funnel against best-in-class.",
+    stat: "20-30%",
+    statLabel: "higher form conversion",
+  },
+  awareness: {
+    label: "Brand Awareness Insight",
+    gradient: "from-violet-400/20 to-indigo-500/20",
+    border: "border-violet-400/30",
+    accent: "text-violet-300",
+    icon: Megaphone,
+    headline: "Reach Multiplier",
+    tip: "Omnichannel retargeting strategies amplify share of voice by 40%+ when layered across search, social, and display. We'll identify your highest-leverage channels.",
+    stat: "40%+",
+    statLabel: "share of voice uplift",
+  },
+};
 
 const slideVariants = {
   enter: (dir) => ({ x: dir > 0 ? 80 : -80, opacity: 0, filter: "blur(6px)" }),
@@ -154,6 +192,7 @@ export default function SmartAuditFlow() {
           ...formData,
           goal,
           adaptiveAnswer,
+          lead_volume: adaptiveAnswer,
         }),
       });
 
@@ -224,15 +263,62 @@ export default function SmartAuditFlow() {
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="flex flex-col items-center gap-5 py-12 text-center"
+          transition={{ type: "spring", stiffness: 200, damping: 20 }}
+          className="flex flex-col items-center gap-8 py-10"
         >
-          <div className="flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-300">
-            <CheckCircle2 size={32} className="text-slate-950" />
+          {/* Success Header */}
+          <div className="flex flex-col items-center gap-4 text-center">
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ type: "spring", stiffness: 300, damping: 15, delay: 0.1 }}
+              className="flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-emerald-400 to-cyan-300 shadow-lg shadow-emerald-400/20"
+            >
+              <CheckCircle2 size={32} className="text-slate-950" />
+            </motion.div>
+            <h3 className="font-display text-2xl font-semibold text-white">Audit request sent!</h3>
+            <p className="max-w-md text-sm leading-7 text-slate-400">
+              We will review your funnel and respond within one business day with an opportunity map and clear next steps.
+            </p>
           </div>
-          <h3 className="font-display text-2xl font-semibold text-white">Audit request sent!</h3>
-          <p className="max-w-md text-sm leading-7 text-slate-400">
-            We will review your funnel and respond within one business day with an opportunity map and clear next steps.
-          </p>
+
+          {/* Dynamic Discovery Card */}
+          {(() => {
+            const tip = DISCOVERY_TIPS[goal] || DISCOVERY_TIPS.leadgen;
+            const TipIcon = tip.icon;
+            return (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, type: "spring", stiffness: 200, damping: 22 }}
+                className={`w-full max-w-lg rounded-2xl border ${tip.border} bg-gradient-to-br ${tip.gradient} p-6 backdrop-blur-sm`}
+              >
+                <div className="mb-4 flex items-center gap-3">
+                  <div className={`flex size-10 items-center justify-center rounded-xl bg-white/[0.08] ${tip.accent}`}>
+                    <Lightbulb size={20} />
+                  </div>
+                  <div>
+                    <p className={`text-xs font-semibold uppercase tracking-[0.18em] ${tip.accent}`}>
+                      {tip.label}
+                    </p>
+                    <p className="text-lg font-semibold text-white">{tip.headline}</p>
+                  </div>
+                </div>
+
+                <p className="mb-5 text-sm leading-7 text-slate-300">
+                  {tip.tip}
+                </p>
+
+                <div className="flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.04] px-4 py-3">
+                  <Sparkles size={18} className={tip.accent} />
+                  <div>
+                    <span className={`text-2xl font-bold ${tip.accent}`}>{tip.stat}</span>
+                    <span className="ml-2 text-xs text-slate-400">{tip.statLabel}</span>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })()}
         </motion.div>
       ) : (
         /* Step Content */

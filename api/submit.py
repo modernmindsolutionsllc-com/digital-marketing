@@ -24,6 +24,43 @@ cipher = Fernet(SECRET_KEY.encode())
 app = Flask(__name__)
 
 
+# ── Lead Scoring Engine ──────────────────────────────────────────
+def calculate_lead_priority(goal_value, volume):
+    """
+    Calculates lead priority based on the scoring matrix.
+    Returns 1 (Hot), 2 (Warm), or 3 (Cold).
+
+    Priority 1 (Hot):
+      - Volume is "200plus" (any goal)
+      - Goal is "ecommerce" with volume "50to200"
+
+    Priority 2 (Warm):
+      - Volume is "50to200" (non-ecommerce goals)
+      - Goal is "leadgen" with volume "under50"
+
+    Priority 3 (Cold):
+      - Everything else (awareness/ecommerce with under50, or no volume)
+    """
+    # Normalize inputs
+    g = (goal_value or "").lower().strip()
+    v = (volume or "").lower().strip()
+
+    # ── Priority 1: Hot leads ────────────────────────────────────
+    if v == "200plus":
+        return 1
+    if g == "ecommerce" and v == "50to200":
+        return 1
+
+    # ── Priority 2: Warm leads ───────────────────────────────────
+    if v == "50to200" and g != "ecommerce":
+        return 2
+    if g == "leadgen" and v == "under50":
+        return 2
+
+    # ── Priority 3: Cold leads ───────────────────────────────────
+    return 3
+
+
 @app.route("/", methods=["POST"])
 @app.route("/api/submit", methods=["POST"])
 def handle_lead():
@@ -45,6 +82,7 @@ def handle_lead():
     service = (body.get("service") or "").strip()
     goal = (body.get("goal") or "").strip()
     adaptive_answer = (body.get("adaptiveAnswer") or "").strip()
+    lead_volume = (body.get("lead_volume") or adaptive_answer).strip()  # fallback to adaptive_answer
     description = (body.get("description") or "").strip()
 
     # ── Basic validation ─────────────────────────────────────────
@@ -57,14 +95,19 @@ def handle_lead():
     # ── Encrypt sensitive fields ─────────────────────────────────
     encrypted_phone = cipher.encrypt(phone.encode()).decode()
 
+    # ── Calculate lead priority ───────────────────────────────────
+    resolved_goal = service or goal
+    lead_priority = calculate_lead_priority(resolved_goal, lead_volume)
+
     # ── Build the row payload ────────────────────────────────────
     row = {
         "name": name,
         "phone_encrypted": encrypted_phone,
         "email": email,
         "company": company,
-        "service": service or goal,       # audit form sends "service", smart-audit sends "goal"
+        "service": resolved_goal,
         "adaptive_answer": adaptive_answer,
+        "lead_priority": lead_priority,
         "description": description,
         "created_at": datetime.now(timezone.utc).isoformat(),
     }
