@@ -236,7 +236,7 @@ export default function SmartAuditFlow() {
         </motion.div>
       ) : (
         /* Step Content */
-        <div className="relative min-h-[22rem] overflow-hidden">
+        <div className={`relative ${step < 2 ? "min-h-[22rem] overflow-hidden" : ""}`}>
           <AnimatePresence mode="wait" custom={direction}>
             {step === 0 ? (
               <motion.div
@@ -324,7 +324,7 @@ export default function SmartAuditFlow() {
                 animate="center"
                 exit="exit"
                 transition={{ type: "spring", stiffness: 260, damping: 28 }}
-                className="absolute inset-x-0 top-0"
+                className="inset-x-0 top-0"
               >
                 <h3 className="font-display text-xl font-semibold tracking-tight text-white sm:text-2xl">
                   Almost there — how do we reach you?
