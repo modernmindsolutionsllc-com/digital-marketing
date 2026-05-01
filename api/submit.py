@@ -24,40 +24,48 @@ cipher = Fernet(SECRET_KEY.encode())
 app = Flask(__name__)
 
 
-# ── Lead Scoring Engine ──────────────────────────────────────────
-def calculate_lead_priority(goal_value, volume):
+# ── Lead Scoring Engine (Context-Aware) ──────────────────────────
+def calculate_lead_priority(goal_value, adaptive_answer):
     """
-    Calculates lead priority based on the scoring matrix.
+    Context-aware lead scoring. The adaptive_answer field changes
+    meaning depending on the goal:
+
+      Lead Gen  → adaptive_answer = volume  (under50 / 50to200 / 200plus)
+      Ecommerce → adaptive_answer = platform (shopify / woocommerce / custom)
+      Awareness → adaptive_answer = channel  (social / content / influencer)
+
     Returns 1 (Hot), 2 (Warm), or 3 (Cold).
-
-    Priority 1 (Hot):
-      - Volume is "200plus" (any goal)
-      - Goal is "ecommerce" with volume "50to200"
-
-    Priority 2 (Warm):
-      - Volume is "50to200" (non-ecommerce goals)
-      - Goal is "leadgen" with volume "under50"
-
-    Priority 3 (Cold):
-      - Everything else (awareness/ecommerce with under50, or no volume)
     """
-    # Normalize inputs
     g = (goal_value or "").lower().strip()
-    v = (volume or "").lower().strip()
+    a = (adaptive_answer or "").lower().strip()
 
-    # ── Priority 1: Hot leads ────────────────────────────────────
-    if v == "200plus":
-        return 1
-    if g == "ecommerce" and v == "50to200":
-        return 1
+    # ── Lead Generation: score by volume ─────────────────────────
+    if g == "leadgen":
+        if a == "200plus":
+            return 1   # Hot — high-volume pipeline
+        if a == "50to200":
+            return 2   # Warm — growing demand
+        return 3       # Cold — early-stage
 
-    # ── Priority 2: Warm leads ───────────────────────────────────
-    if v == "50to200" and g != "ecommerce":
-        return 2
-    if g == "leadgen" and v == "under50":
-        return 2
+    # ── Ecommerce: score by platform complexity ──────────────────
+    if g == "ecommerce":
+        if a == "custom":
+            return 1   # Hot — enterprise / bespoke build = big budget
+        if a in ("shopify", "woocommerce"):
+            return 2   # Warm — established store
+        return 2       # Warm — unknown platform, still valuable
 
-    # ── Priority 3: Cold leads ───────────────────────────────────
+    # ── Brand Awareness: score by channel type ───────────────────
+    if g == "awareness":
+        if a == "influencer":
+            return 2   # Warm — creator-led, high intent
+        if a == "content":
+            return 2   # Warm — SEO / editorial investment
+        if a == "social":
+            return 3   # Cold — broad organic reach
+        return 3       # Cold — unspecified
+
+    # ── Fallback for App.jsx audit form (no adaptive context) ────
     return 3
 
 
@@ -82,7 +90,6 @@ def handle_lead():
     service = (body.get("service") or "").strip()
     goal = (body.get("goal") or "").strip()
     adaptive_answer = (body.get("adaptiveAnswer") or "").strip()
-    lead_volume = (body.get("lead_volume") or adaptive_answer).strip()  # fallback to adaptive_answer
     description = (body.get("description") or "").strip()
 
     # ── Basic validation ─────────────────────────────────────────
@@ -97,7 +104,7 @@ def handle_lead():
 
     # ── Calculate lead priority ───────────────────────────────────
     resolved_goal = service or goal
-    lead_priority = calculate_lead_priority(resolved_goal, lead_volume)
+    lead_priority = calculate_lead_priority(resolved_goal, adaptive_answer)
 
     # ── Build the row payload ────────────────────────────────────
     row = {
