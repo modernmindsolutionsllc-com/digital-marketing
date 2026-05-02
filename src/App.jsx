@@ -375,7 +375,7 @@ export default function App() {
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_30%,_rgba(116,248,255,0.14),_transparent_20%),radial-gradient(circle_at_82%_72%,_rgba(255,153,92,0.18),_transparent_24%)]" />
 
           <div className="section-shell relative flex min-h-[calc(100svh-4.5rem)] items-center py-12 sm:py-14 lg:py-16">
-            <div className="grid w-full gap-9 lg:grid-cols-[0.82fr_1.18fr] lg:items-center">
+            <div className="grid w-full gap-9 lg:grid-cols-[1fr_1fr] lg:items-start">
               <Reveal>
                 <div className="max-w-2xl">
                   <span className="eyebrow">GrowthPulse Digital</span>
